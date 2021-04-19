@@ -1,0 +1,136 @@
+<h1 class="title"> <i class="fas fa-user"></i> {{ titulo }} </h1>
+
+<div id="modal" *ngIf="mode=='cadastrar'" class="animated flipInX">
+    <form [formGroup]="form">
+        <div>
+            <input 
+                type="text"
+                maxlength="100"
+                placeholder="Nome"
+                formControlName="nome"/>
+
+            <small class="danger" *ngIf="(enviouFormulario && form.controls.nome.invalid) || (form.controls.nome.invalid && !form.controls.nome.pristine)">
+                O nome deve conter entre 3 e 60 caracteres
+            </small>
+        </div>
+        
+        <div>
+            <input 
+                placeholder="Telefone"
+                mask="(00) 00000-0000"
+                formControlName="telefone"/>
+
+            <small class="danger" *ngIf="(enviouFormulario && form.controls.telefone.invalid) || (form.controls.telefone.invalid && !form.controls.telefone.pristine)">
+                Telefone inválido
+            </small>
+        </div>
+
+        <div>
+            <input 
+                placeholder="CPF"
+                mask="000.000.000-00"
+                formControlName="cpf"/>
+            
+            <small class="danger" *ngIf="(enviouFormulario && form.controls.cpf.invalid) || (form.controls.cpf.invalid && !form.controls.cpf.pristine)">
+                CPF inválido
+            </small>
+        </div>
+
+        <div>
+            <select formControlName="sexo">
+                <option value="">Definir Sexo</option>
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+            </select>
+        
+            <small class="danger" *ngIf="(form.controls.sexo.invalid && enviouFormulario) || (form.controls.sexo.invalid && !form.controls.sexo.pristine)">
+                Sexo inválido
+            </small>
+        </div>
+
+        <small class="danger" *ngIf="enviouFormulario && form.invalid">
+            *Preencha os campos obrigatórios
+        </small>
+        
+        <p class="text-center">
+            <button id="btSalvar" class="button" (click)="salvar()">
+                <i class="far fa-save"></i>
+                <span>Salvar</span>
+            </button>
+
+            <button id="btCancelar" class="button" (click)="changeMode('inicial')" *ngIf="mode!='inicial'">
+                <i class="fas fa-times-circle"></i>
+                <span>Cancelar</span>
+            </button>
+        </p>  
+    </form>
+</div>
+
+<div id="modal" *ngIf="mode=='pesquisar'" class="animated flipInX">
+
+    <header>
+        <span 
+          class="fa fa-times-circle" 
+          (click)="changeMode('inicial')"
+          style="position: fixed !important; right: 20px !important; top: 15px !important; font-size: 26px !important;">
+        </span>
+    </header>
+    
+    <form [formGroup]="formPesquisar">
+        <div>
+            <select formControlName="buscarPor" class="selectPesquisa" (change)="onChangeBuscarPor($event)">
+                <option value="NOME">Buscar Por Nome</option>
+                <option value="CPF">Buscar Por CPF</option>
+                <option value="TELEFONE">Buscar Por Telefone</option>
+            </select>
+
+            <input 
+                type="text"
+                maxlength="100"
+                mask="{{ mascara }}"
+                class="inputPesquisar"
+                placeholder="Digite a chave de pesquisa"
+                formControlName="chavePesquisa"/>
+            
+            <button id="btPesquisar" class="button" (click)="pesquisar()">
+                <i class="fa fa-search"></i>
+                <span>Pesquisar</span>
+            </button>
+        </div>
+
+        <div style="max-height: calc(80vh - 300px); min-height: 200px; overflow: auto">
+            <ul>
+                <p class="text-center" *ngIf="clientes.length == 0">Nenhum cliente encontrado!</p>
+                <li *ngFor="let cliente of clientes">
+                    <div>
+                        <label title="Nome"> <i class="fa fa-user" style="color: #696969;"></i> {{cliente.nome}} </label> 
+                    </div>
+                    <div>
+                        <label title="CPF" mask="000.000.000-00"> <i class="fa fa-info-circle" style="color: #696969;"></i> {{ mascaraCPF(cliente.cpf) }} </label> 
+                    </div>
+                    <div>
+                        <label title="Sexo"> <i class="fa fa-info-circle" style="color: #696969;"></i> {{cliente.sexo == 'M' ? 'Masculino' : 'Feminino'}} </label> 
+                    </div>
+                    <div>
+                        <label title="Telefone"> <i class="fa fa-phone" style="color: #696969;"></i> {{ mascaraTelefone(cliente.telefone) }} </label> 
+                    </div>
+
+                    <div>
+                        <button title="Excluir" (click)="excluir(cliente)"><i class="far fa-trash-alt"></i></button>
+                        <button title="Alterar" (click)="alterar(cliente)"><i class="fa fa-pen-alt"></i></button>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </form>
+</div>
+
+<button class="add-button animated fadeInUp button" (click)="changeMode('cadastrar')" *ngIf="mode=='inicial'">
+    <i class="fas fa-plus-circle"></i>
+    <span>Cadastrar</span>
+</button>
+
+<button class="add-button animated fadeInUp button" (click)="changeMode('pesquisar')" *ngIf="mode=='inicial'">
+    <i class="fas fa-search"></i>
+    <span>Pesquisar</span>
+</button>
